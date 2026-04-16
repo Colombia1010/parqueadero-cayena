@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Registro Parqueadero - Cayena</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 550px;
+            margin: auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0px 8px 25px rgba(0,0,0,0.2);
+            overflow: hidden;
+            animation: fadeIn 0.6s ease-in-out;
+        }
+
+        /* IMAGEN */
+        .banner-img {
+            width: 100%;
+            height: 180px;
+            object-fit: contain;
+            background: #f4f4f4;
+        }
+
+        .content {
+            padding: 25px;
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        label {
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            margin-bottom: 12px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+            transition: 0.2s;
+        }
+
+        input:focus, select:focus {
+            border-color: #6366f1;
+            outline: none;
+            box-shadow: 0 0 5px rgba(99,102,241,0.3);
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #6366f1;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        button:hover {
+            background-color: #4f46e5;
+        }
+
+        .section-title {
+            margin-top: 20px;
+            margin-bottom: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            color: #444;
+        }
+
+        /* MENSAJE BONITO */
+        .success-message {
+            display: none;
+            background: #4CAF50;
+            color: white;
+            padding: 15px;
+            text-align: center;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            animation: fadeIn 0.5s;
+        }
+
+        /* LOADER */
+        .loader {
+            display: none;
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        /* ANIMACIONES */
+        @keyframes fadeIn {
+            from {opacity: 0; transform: translateY(10px);}
+            to {opacity: 1; transform: translateY(0);}
+        }
+
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <!-- IMAGEN -->
+    <img src="{{ url_for('static', filename='sorteo_parqueaderos_cayena.jpg') }}" class="banner-img">
+
+    <div class="content">
+
+        <div id="success" class="success-message">
+            ✅ Registro enviado correctamente
+        </div>
+
+        <h2>Registro Parqueadero Cayena</h2>
+
+        <form action="/registro" method="POST" enctype="multipart/form-data" onsubmit="mostrarLoader()">
+
+            <!-- DATOS -->
+            <div class="section-title">👤 Datos Básicos</div>
+
+            <input type="text" name="cedula" placeholder="Cédula" required>
+            <input type="text" name="nombre" placeholder="Nombre" required>
+
+            <!-- APARTAMENTO -->
+            <div class="section-title">🏢 Apartamento</div>
+
+            <input type="number" name="torre" placeholder="Torre" max="99" required>
+            <input type="number" name="apto" placeholder="Apto" max="9999" required>
+
+            <!-- PERSONAL -->
+            <div class="section-title">📋 Información Personal</div>
+
+            <input type="text" name="nombre_propiedad" placeholder="Nombre Tarjeta Propiedad" required>
+            <input type="text" name="celular" placeholder="Celular (10 dígitos)" pattern="[0-9]{10}" required>
+            <input type="email" name="correo" placeholder="Correo" required>
+            <input type="text" name="nombre_propietario" placeholder="Propietario" required>
+            <input type="email" name="mail_propietario" placeholder="Email Propietario" required>
+
+            <input type="text" name="celular1" placeholder="Celular adicional">
+            <input type="text" name="nombre_arrendatario" placeholder="Arrendatario">
+
+            <!-- VEHÍCULO -->
+            <div class="section-title">🚗 Vehículo</div>
+
+            <select name="vehiculo" required>
+                <option value="">Seleccione tipo</option>
+                <option value="Moto">Moto</option>
+                <option value="Carro">Carro</option>
+                <option value="Bicicleta Electrica">Bicicleta Eléctrica</option>
+            </select>
+
+            <input type="text" name="placa" placeholder="Placa" maxlength="6" required>
+            <input type="text" name="marca" placeholder="Marca" required>
+            <input type="text" name="modelo" placeholder="Modelo" required>
+            <input type="text" name="color" placeholder="Color" required>
+
+            <!-- DOCUMENTOS -->
+            <div class="section-title">📄 Documentos</div>
+
+            <input type="file" name="cedula_doc" required>
+            <input type="file" name="soat" required>
+            <input type="file" name="tarjeta" required>
+
+            <button type="submit">Registrar</button>
+
+            <div class="loader" id="loader">
+                ⏳ Enviando información...
+            </div>
+
+        </form>
+    </div>
+</div>
+
+<script>
+function mostrarLoader() {
+    document.getElementById("loader").style.display = "block";
+}
+</script>
+
+</body>
+</html>

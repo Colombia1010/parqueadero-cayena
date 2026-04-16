@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Admin | Cayena</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #6366f1;
+            --primary-hover: #4f46e5;
+            --bg-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --text-color: #1f2937;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-gradient);
+            height: 100vh;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .login-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 380px;
+            text-align: center;
+            overflow: hidden; /* Esto asegura que la imagen no se salga de las esquinas redondeadas */
+        }
+
+        /* Estilo para que la imagen se ajuste perfectamente */
+        .banner-img {
+	    width: 100%;
+	    height: auto;
+	    object-fit: contain;
+	    background-color: #f4f4f4;
+	    padding: 10px;
+	}
+
+        .form-container {
+            padding: 2rem 2.5rem 2.5rem 2.5rem;
+        }
+
+        .login-card h2 {
+            margin-bottom: 1.5rem;
+            color: var(--text-color);
+            font-weight: 600;
+            font-size: 1.6rem;
+        }
+
+        .input-group {
+            margin-bottom: 1.2rem;
+            text-align: left;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px 15px;
+            margin-top: 5px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            box-sizing: border-box;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+
+        input:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+        }
+
+        button {
+            width: 100%;
+            background-color: var(--primary-color);
+            color: white;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            margin-top: 1rem;
+        }
+
+        button:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-1px);
+        }
+
+        .footer-text {
+            margin-top: 1.5rem;
+            font-size: 0.85rem;
+            color: #6b7280;
+            line-height: 1.4;
+        }
+    </style>
+</head>
+<body>
+
+<div class="login-card">
+    <img src="{{ url_for('static', filename='sorteo_parqueaderos_cayena.jpg') }}" class="banner-img">
+
+    <div class="form-container">
+        <h2>Admin Login</h2>
+        
+        <form method="POST">
+            <div class="input-group">
+                <input type="text" name="usuario" placeholder="Usuario" required>
+            </div>
+            
+            <div class="input-group">
+                <input type="password" name="password" placeholder="Contraseña" required>
+            </div>
+            
+            <button type="submit">Ingresar al Sistema</button>
+        </form>
+
+        <p class="footer-text">
+            © 2026 Administración Cayena <br> 
+            <strong>Todos los derechos reservados</strong>
+        </p>
+    </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,23 @@
+{
+    "usuarios": [
+        {
+            "cedula": "123",
+            "nombre": "Luis Larrota",
+            "torre": "5",
+            "apto": "901",
+            "nombre_propiedad": "123",
+            "celular": "3133131797",
+            "correo": "hola@com.co",
+            "nombre_propietario": "luis larrota",
+            "mail_propietario": "hola@com.co",
+            "celular1": "",
+            "nombre_arrendatario": "",
+            "vehiculo": "Moto",
+            "placa": "ght23r",
+            "marca": "kawa",
+            "modelo": "2020",
+            "color": "verde negro",
+            "fecha_registro": "2026-04-12 23:56:38.293336"
+        }
+    ]
+}

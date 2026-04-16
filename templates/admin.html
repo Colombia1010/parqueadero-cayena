@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Panel Admin - Cayena</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0px 8px 25px rgba(0,0,0,0.2);
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .btn-excel {
+            background: #22c55e;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-bottom: 15px;
+        }
+
+        .btn-excel:hover {
+            background: #16a34a;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background-color: #6366f1;
+            color: white;
+            padding: 10px;
+        }
+
+        td {
+            padding: 8px;
+            text-align: center;
+            border-bottom: 1px solid #ddd;
+        }
+
+        tr:hover {
+            background-color: #f9fafb;
+        }
+
+        a {
+            color: #4f46e5;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <h2>📊 Panel de Administración</h2>
+
+    <!-- BOTÓN EXCEL -->
+    <a href="/exportar_excel">
+        <button class="btn-excel">📊 Exportar a Excel</button>
+    </a>
+
+    <table>
+        <tr>
+            <th>Cédula</th>
+            <th>Nombre</th>
+            <th>Torre</th>
+            <th>Apto</th>
+            <th>Vehículo</th>
+            <th>Placa</th>
+            <th>Marca</th>
+            <th>Modelo</th>
+            <th>Color</th>
+            <th>Celular</th>
+            <th>Correo</th>
+            <th>Documentos</th>
+        </tr>
+
+        {% for u in usuarios %}
+        <tr>
+            <td>{{ u.cedula }}</td>
+            <td>{{ u.nombre }}</td>
+            <td>{{ u.torre }}</td>
+            <td>{{ u.apto }}</td>
+            <td>{{ u.vehiculo }}</td>
+            <td>{{ u.placa }}</td>
+            <td>{{ u.marca }}</td>
+            <td>{{ u.modelo }}</td>
+            <td>{{ u.color }}</td>
+            <td>{{ u.celular }}</td>
+            <td>{{ u.correo }}</td>
+
+            <td>
+                {% for archivo in u.archivos %}
+                    <a href="/uploads/{{ u.cedula }}/{{ archivo }}" target="_blank">
+                        📄 Ver
+                    </a><br>
+                {% endfor %}
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+
+</div>
+
+</body>
+</html>
