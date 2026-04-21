@@ -1,12 +1,14 @@
-from flask import Flask, request, render_template, redirect, session, url_for, send_from_directory
-import os
+from flask import Flask, request, render_template, redirect, session, send_from_directory, send_file
 from werkzeug.utils import secure_filename
 from usuarios import UsuarioManager
 from servicios import UsuarioServicio
 from openpyxl import Workbook
 from openpyxl.styles import Font, PatternFill, Alignment
+from openpyxl.utils import get_column_letter
+from openpyxl.drawing.image import Image
 from flask import send_file
 import io
+import os
 
 app = Flask(__name__)
 app.secret_key = "clave_secreta"
@@ -19,6 +21,10 @@ usuario_servicio = UsuarioServicio()
 
 ALLOWED_EXTENSIONS = {'pdf', 'png', 'jpg', 'jpeg'}
 
+
+# ---------------------------
+# VALIDAR ARCHIVOS
+# ---------------------------
 def archivo_permitido(nombre):
     return '.' in nombre and nombre.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
@@ -36,60 +42,101 @@ def inicio():
 # ---------------------------
 @app.route('/registro', methods=['POST'])
 def registro():
+    try:
+        # -------------------------
+        # DATOS
+        # -------------------------
+        cedula = request.form['cedula']
+        nombre = request.form['nombre']
+        torre = request.form['torre']
+        apto = request.form['apto']
+        nombre_propiedad = request.form['nombre_propiedad']
+        celular = request.form['celular']
+        correo = request.form['correo']
+        nombre_propietario = request.form['nombre_propietario']
+        mail_propietario = request.form['mail_propietario']
+        celular1 = request.form.get('celular1')
+        nombre_arrendatario = request.form.get('nombre_arrendatario')
+        vehiculo = request.form['vehiculo']
+        placa = request.form['placa']
+        marca = request.form['marca']
+        modelo = request.form['modelo']
+        color = request.form['color']
 
-    cedula = request.form['cedula']
-    nombre = request.form['nombre']
+        # -------------------------
+        # VALIDACIONES
+        # -------------------------
+        if len(torre) > 2:
+            return "❌ Torre inválida"
 
-    torre = request.form['torre']
-    apto = request.form['apto']
-    nombre_propiedad = request.form['nombre_propiedad']
-    celular = request.form['celular']
-    correo = request.form['correo']
-    nombre_propietario = request.form['nombre_propietario']
-    mail_propietario = request.form['mail_propietario']
-    celular1 = request.form.get('celular1')
-    nombre_arrendatario = request.form.get('nombre_arrendatario')
-    vehiculo = request.form['vehiculo']
-    placa = request.form['placa']
-    marca = request.form['marca']
-    modelo = request.form['modelo']
-    color = request.form['color']
+        if len(apto) > 4:
+            return "❌ Apto inválido"
 
-    # VALIDACIONES
-    if len(torre) > 2:
-        return "Torre inválida"
+        if not celular.isdigit() or len(celular) != 10:
+            return "❌ Celular inválido"
 
-    if len(apto) > 4:
-        return "Apto inválido"
+        if len(placa) > 6:
+            return "❌ Placa inválida"
 
-    if not celular.isdigit() or len(celular) != 10:
-        return "Celular inválido"
+        # -------------------------
+        # VALIDAR DUPLICADO
+        # -------------------------
+        if usuario_manager.usuario_existe(cedula):
+            return "⚠️ Usuario ya registrado (puedes actualizar documentos)"
 
-    if len(placa) > 6:
-        return "Placa inválida"
+        # -------------------------
+        # CARPETA USUARIO
+        # -------------------------
+        ruta_usuario = os.path.join(UPLOAD_FOLDER, cedula)
+        os.makedirs(ruta_usuario, exist_ok=True)
 
-    # Crear carpeta usuario
-    ruta_usuario = os.path.join(UPLOAD_FOLDER, cedula)
-    os.makedirs(ruta_usuario, exist_ok=True)
+        # -------------------------
+        # GUARDAR ARCHIVOS
+        # -------------------------
+        archivos_campos = ['cedula_doc', 'soat', 'tarjeta']
 
-    # Guardar archivos
-    for campo in ['cedula_doc', 'soat', 'tarjeta']:
-        archivo = request.files[campo]
+        for campo in archivos_campos:
+            archivo = request.files.get(campo)
 
-        if archivo and archivo_permitido(archivo.filename):
-            nombre_seguro = secure_filename(archivo.filename)
-            archivo.save(os.path.join(ruta_usuario, nombre_seguro))
-        else:
-            return f"Archivo inválido: {campo}"
+            if archivo and archivo.filename != "":
+                if archivo_permitido(archivo.filename):
+                    nombre_seguro = secure_filename(f"{campo}_{archivo.filename}")
+                    archivo.save(os.path.join(ruta_usuario, nombre_seguro))
+                else:
+                    return f"Archivo inválido: {campo}"
 
-    # Guardar usuario
-    usuario_manager.guardar_usuario(
-        cedula, nombre, torre, apto, nombre_propiedad, celular, correo,
-        nombre_propietario, mail_propietario, celular1,
-        nombre_arrendatario, vehiculo, placa, marca, modelo, color
-    )
+        # -------------------------
+        # CREAR OBJETO USUARIO
+        # -------------------------
+        datos = {
+            "cedula": cedula,
+            "nombre": nombre,
+            "torre": torre,
+            "apto": apto,
+            "nombre_propiedad": nombre_propiedad,
+            "celular": celular,
+            "correo": correo,
+            "nombre_propietario": nombre_propietario,
+            "mail_propietario": mail_propietario,
+            "celular1": celular1,
+            "nombre_arrendatario": nombre_arrendatario,
+            "vehiculo": vehiculo,
+            "placa": placa,
+            "marca": marca,
+            "modelo": modelo,
+            "color": color
+        }
 
-    return "Registro exitoso"
+        # -------------------------
+        # GUARDAR
+        # -------------------------
+        usuario_manager.guardar_usuario(datos)
+
+        return "✅ Registro exitoso"
+
+    except Exception as e:
+        print("ERROR:", e)
+        return "❌ Error interno del servidor"
 
 
 # ---------------------------
@@ -103,52 +150,62 @@ def admin():
     usuarios = usuario_servicio.obtener_usuarios_con_estado()
     return render_template('admin.html', usuarios=usuarios)
 
-from openpyxl import Workbook
-from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
-from openpyxl.drawing.image import Image
-from flask import send_file
-import io
 
-
+# ---------------------------
+# EXPORTAR EXCEL PRO
+# ---------------------------
 @app.route('/exportar_excel')
 def exportar_excel():
-
     usuarios = usuario_servicio.obtener_usuarios_con_estado()
 
     wb = Workbook()
     ws = wb.active
-    ws.title = "Parqueadero Cayena"
+    ws.title = "Reporte Cayena"
 
     # -------------------------
-    # LOGO
+    # HEADER TIPO BANNER
     # -------------------------
+    ws.merge_cells('A1:Q3')
+
     try:
-        import os
         ruta_logo = os.path.join(os.getcwd(), "static", "logo.png")
-        print("Ruta logo:", ruta_logo)
 
-        img = Image(ruta_logo)
-        img.width = 120
-        img.height = 80
-        ws.add_image(img, "E1")
+        if os.path.exists(ruta_logo):
+            img = Image(ruta_logo)
+            img.width = 900   # 👈 ancho grande tipo banner
+            img.height = 150  # 👈 alto tipo cabecera
+
+            ws.add_image(img, "A1")
+
+        else:
+            print("⚠️ Logo no encontrado")
 
     except Exception as e:
         print("ERROR LOGO:", e)
 
+    # Ajustar altura
+    ws.row_dimensions[1].height = 60
+    ws.row_dimensions[2].height = 60
+    ws.row_dimensions[3].height = 40
+
     # -------------------------
     # TÍTULO
     # -------------------------
-    ws.merge_cells('A5:K5')
-    ws['A5'] = "REPORTE PARQUEADERO - CONJUNTO CAYENA"
-    ws['A5'].font = Font(size=14, bold=True)
-    ws['A5'].alignment = Alignment(horizontal="center")
+    ws.merge_cells('A4:Q4')
+    ws['A4'] = "REPORTE PARQUEADERO - CONJUNTO CAYENA"
+    ws['A4'].font = Font(size=14, bold=True)
+    ws['A4'].alignment = Alignment(horizontal="center")
 
     # -------------------------
     # HEADERS
     # -------------------------
     headers = [
-        "Cédula", "Nombre", "Torre", "Apto", "Vehículo",
-        "Placa", "Marca", "Modelo", "Color", "Celular", "Correo"
+        "Cédula", "Nombre", "Torre", "Apto",
+        "Nombre Tarjeta", "Celular", "Correo",
+        "Propietario", "Mail Propietario",
+        "Celular 2", "Arrendatario",
+        "Vehículo", "Placa", "Marca", "Modelo", "Color",
+        "Estado"
     ]
 
     ws.append([])
@@ -156,13 +213,13 @@ def exportar_excel():
 
     header_row = ws.max_row
 
-    fill = PatternFill(start_color="6366F1", end_color="6366F1", fill_type="solid")
+    fill = PatternFill(start_color="0F172A", end_color="0F172A", fill_type="solid")
     font = Font(bold=True, color="FFFFFF")
 
-    for col in ws[header_row]:
-        col.fill = fill
-        col.font = font
-        col.alignment = Alignment(horizontal="center")
+    for cell in ws[header_row]:
+        cell.fill = fill
+        cell.font = font
+        cell.alignment = Alignment(horizontal="center")
 
     # -------------------------
     # DATOS
@@ -173,35 +230,42 @@ def exportar_excel():
             u.get("nombre"),
             u.get("torre"),
             u.get("apto"),
+            u.get("nombre_propiedad"),
+            u.get("celular"),
+            u.get("correo"),
+            u.get("nombre_propietario"),
+            u.get("mail_propietario"),
+            u.get("celular1"),
+            u.get("nombre_arrendatario"),
             u.get("vehiculo"),
             u.get("placa"),
             u.get("marca"),
             u.get("modelo"),
             u.get("color"),
-            u.get("celular"),
-            u.get("correo")
+            u.get("estado")
         ])
 
     # -------------------------
-    # BORDES
+    # FILAS TIPO TABLA (alternadas)
     # -------------------------
-    thin = Border(
-        left=Side(style='thin'),
-        right=Side(style='thin'),
-        top=Side(style='thin'),
-        bottom=Side(style='thin')
-    )
+    fill_gris = PatternFill(start_color="F3F4F6", end_color="F3F4F6", fill_type="solid")
 
-    for row in ws.iter_rows(min_row=header_row, max_row=ws.max_row):
-        for cell in row:
-            cell.border = thin
+    for i, row in enumerate(ws.iter_rows(min_row=header_row+1, max_row=ws.max_row), start=1):
+        if i % 2 == 0:
+            for cell in row:
+                cell.fill = fill_gris
+
+    # -------------------------
+    # SIN GRID (PRO)
+    # -------------------------
+    ws.sheet_view.showGridLines = False
 
     # -------------------------
     # AUTO AJUSTE
     # -------------------------
-    for col in ws.columns:
+    for i, col in enumerate(ws.columns, 1):
         max_length = 0
-        col_letter = col[0].column_letter
+        column = get_column_letter(i)
 
         for cell in col:
             try:
@@ -210,12 +274,7 @@ def exportar_excel():
             except:
                 pass
 
-        ws.column_dimensions[col_letter].width = max_length + 3
-
-    # -------------------------
-    # FILTROS
-    # -------------------------
-    ws.auto_filter.ref = f"A{header_row}:K{header_row}"
+        ws.column_dimensions[column].width = max_length + 3
 
     # -------------------------
     # EXPORTAR
@@ -227,9 +286,10 @@ def exportar_excel():
     return send_file(
         stream,
         as_attachment=True,
-        download_name="reporte_cayena.xlsx",
+        download_name="reporte_cayena_pro.xlsx",
         mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
     )
+
 
 # ---------------------------
 # LOGIN
@@ -242,7 +302,7 @@ def login():
             session['admin'] = True
             return redirect('/admin')
 
-        return "Credenciales incorrectas"
+        return "❌ Credenciales incorrectas"
 
     return render_template('login.html')
 
@@ -255,5 +315,8 @@ def descargar_archivo(cedula, filename):
     return send_from_directory(f'uploads/{cedula}', filename)
 
 
+# ---------------------------
+# RUN
+# ---------------------------
 if __name__ == '__main__':
     app.run(debug=True)
