@@ -1,0 +1,4 @@
+[2026-05-03 23:52:10] INFO — app — 🚀 Aplicación iniciada en modo production
+[2026-05-03 23:54:03] INFO — app — 🚀 Aplicación iniciada en modo production
+[2026-05-03 23:55:51] WARNING — app — 🚫 Intento de registro con placa no autorizada: GIC23F
+[2026-05-03 23:56:18] INFO — app — ✅ Login exitoso para usuario: admin

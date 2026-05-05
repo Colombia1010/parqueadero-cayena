@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Registro Parqueadero Cayena</title>
+
+<style>
+:root {
+    --primary: #6366f1;
+    --success: #16a34a;
+    --error: #dc2626;
+}
+
+body {
+    font-family: 'Segoe UI', sans-serif;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    margin: 0;
+    display: flex;
+    justify-content: center;
+}
+
+.container {
+    background: white;
+    width: 95%;
+    max-width: 650px;
+    border-radius: 20px;
+    overflow: hidden;
+    margin: 20px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+}
+
+.banner {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+}
+
+.form {
+    padding: 25px;
+}
+
+h2 {
+    text-align: center;
+}
+
+label {
+    font-weight: 600;
+    display: block;
+    margin-top: 10px;
+}
+
+.required::after {
+    content: " *";
+    color: red;
+}
+
+input, select {
+    width: 100%;
+    padding: 10px;
+    margin-top: 5px;
+    margin-bottom: 12px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+}
+
+button {
+    width: 100%;
+    padding: 12px;
+    background: var(--primary);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+button:disabled {
+    background: #aaa;
+}
+
+.mensaje {
+    margin-top: 15px;
+    padding: 12px;
+    border-radius: 8px;
+    display: none;
+    text-align: center;
+    font-weight: bold;
+}
+
+.ok { background: #dcfce7; color: var(--success); }
+.error { background: #fee2e2; color: var(--error); }
+
+.tip {
+    font-size: 14px;
+    color: #555;
+    text-align: center;
+    margin-bottom: 15px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<img src="{{ url_for('static', filename='sorteo_parqueaderos_cayena.jpg') }}" class="banner">
+
+<div class="form">
+
+<h2>🚗 Registro Parqueadero</h2>
+
+<p class="tip">
+    Los campos con <span style="color:red">*</span> son obligatorios
+</p>
+
+<form id="formRegistro" enctype="multipart/form-data">
+
+<!-- DATOS PERSONALES -->
+<label class="required">Cédula</label>
+<input name="cedula" required>
+
+<label class="required">Nombre</label>
+<input name="nombre" required>
+
+<label class="required">Torre</label>
+<input name="torre" pattern="\d{1,2}" required>
+
+<label class="required">Apto</label>
+<input name="apto" pattern="\d{1,4}" required>
+
+<label class="required">Nombre Tarjeta Propiedad</label>
+<input name="nombre_propiedad" required>
+
+<label class="required">Celular</label>
+<input name="celular" pattern="\d{10}" required>
+
+<label class="required">Correo</label>
+<input name="correo" type="email" required>
+
+<label class="required">Nombre Propietario</label>
+<input name="nombre_propietario" required>
+
+<label class="required">Email Propietario</label>
+<input name="mail_propietario" type="email" required>
+
+<label>Celular Opcional</label>
+<input name="celular1">
+
+<label>Arrendatario (Opcional)</label>
+<input name="nombre_arrendatario">
+
+<!-- VEHÍCULO -->
+<label class="required">Vehículo</label>
+<select name="vehiculo" required>
+    <option value="">Seleccione</option>
+    <option>Moto</option>
+    <option>Carro</option>
+    <option>Bicicleta Electrica</option>
+</select>
+
+<label class="required">Placa</label>
+<input name="placa" maxlength="6" required>
+
+<label class="required">Marca</label>
+<input name="marca" required>
+
+<label class="required">Modelo</label>
+<input name="modelo" required>
+
+<label class="required">Color</label>
+<input name="color" required>
+
+<!-- DOCUMENTOS -->
+<h3>📄 Documentos</h3>
+
+<label class="required">Cédula (archivo)</label>
+<input type="file" name="cedula_doc" accept=".pdf,.jpg,.jpeg,.png" required>
+
+<label class="required">SOAT</label>
+<input type="file" name="soat" accept=".pdf,.jpg,.jpeg,.png" required>
+
+<label class="required">Tarjeta de Propiedad</label>
+<input type="file" name="tarjeta" accept=".pdf,.jpg,.jpeg,.png" required>
+
+<button id="btnEnviar" disabled>Enviar Registro</button>
+
+</form>
+
+<div id="mensaje" class="mensaje"></div>
+
+</div>
+</div>
+
+<script>
+const form = document.getElementById("formRegistro");
+const btn = document.getElementById("btnEnviar");
+const inputs = document.querySelectorAll("input[required], select[required]");
+const mensaje = document.getElementById("mensaje");
+
+// Activar botón cuando todo esté lleno
+function validar() {
+    let valido = true;
+    inputs.forEach(i => {
+        if (!i.value) valido = false;
+    });
+    btn.disabled = !valido;
+}
+
+inputs.forEach(i => i.addEventListener("input", validar));
+
+// Enviar sin recargar
+form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const formData = new FormData(form);
+
+    const res = await fetch("/registro", {
+        method: "POST",
+        body: formData
+    });
+
+    const text = await res.text();
+
+    mensaje.style.display = "block";
+    mensaje.innerText = text;
+
+    if (text.includes("✅")) {
+        mensaje.className = "mensaje ok";
+        form.reset();
+        btn.disabled = true;
+    } else {
+        mensaje.className = "mensaje error";
+    }
+});
+</script>
+
+</body>
+</html>

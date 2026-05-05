@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel Admin - Cayena</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            padding: 25px;
+            border-radius: 16px;
+            box-shadow: 0px 8px 25px rgba(0,0,0,0.2);
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* ── HEADER ── */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .header h2 { font-size: 1.4rem; color: #1f2937; }
+
+        .btn {
+            padding: 9px 16px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 0.88rem;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-excel   { background: #22c55e; color: white; }
+        .btn-excel:hover { background: #16a34a; }
+        .btn-logout  { background: #ef4444; color: white; }
+        .btn-logout:hover { background: #dc2626; }
+
+        /* ── TABS ── */
+        .tabs {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #e5e7eb;
+            flex-wrap: wrap;
+        }
+
+        .tab {
+            padding: 10px 18px;
+            cursor: pointer;
+            border-radius: 8px 8px 0 0;
+            font-weight: 600;
+            color: #6b7280;
+            border: none;
+            background: none;
+            font-size: 0.9rem;
+        }
+
+        .tab.active { background: #6366f1; color: white; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        /* ── TABLA ── */
+        .table-wrap { overflow-x: auto; }
+
+        table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+
+        th {
+            background-color: #1e1b4b;
+            color: white;
+            padding: 10px;
+            text-align: left;
+            white-space: nowrap;
+        }
+
+        td {
+            padding: 8px 10px;
+            border-bottom: 1px solid #e5e7eb;
+            vertical-align: middle;
+        }
+
+        tr:hover td { background-color: #f9fafb; }
+        a { color: #4f46e5; text-decoration: none; }
+
+        /* ── BADGES ── */
+        .badge {
+            padding: 3px 10px;
+            border-radius: 99px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .badge-ok  { background: #dcfce7; color: #16a34a; }
+        .badge-sin { background: #fee2e2; color: #dc2626; }
+        .badge-tipo-carro { background: #dbeafe; color: #1d4ed8; }
+        .badge-tipo-moto  { background: #fef9c3; color: #a16207; }
+        .badge-tipo-bici  { background: #dcfce7; color: #15803d; }
+
+        /* ── PANELES FORMULARIOS ── */
+        .panel {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 18px 20px;
+            margin-bottom: 20px;
+        }
+
+        .panel h3 {
+            font-size: 0.95rem;
+            color: #1f2937;
+            margin-bottom: 14px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+            align-items: end;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 4px;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 8px 10px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 0.88rem;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #6366f1;
+            box-shadow: 0 0 0 3px rgba(99,102,241,0.15);
+        }
+
+        /* ── CARGA EXCEL ── */
+        .upload-area {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .upload-area input[type="file"] {
+            border: 2px dashed #a5b4fc;
+            border-radius: 8px;
+            padding: 10px 14px;
+            background: #eef2ff;
+            font-size: 0.88rem;
+            flex: 1;
+            min-width: 200px;
+            cursor: pointer;
+        }
+
+        .upload-info {
+            font-size: 0.8rem;
+            color: #6b7280;
+            margin-top: 6px;
+        }
+
+        /* ── BOTONES ACCIÓN ── */
+        .btn-agregar {
+            background: #6366f1;
+            color: white;
+            padding: 8px 18px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            align-self: end;
+        }
+
+        .btn-agregar:hover { background: #4f46e5; }
+
+        .btn-cargar {
+            background: #0ea5e9;
+            color: white;
+            padding: 9px 18px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
+        .btn-cargar:hover { background: #0284c7; }
+
+        .btn-eliminar {
+            background: #fee2e2;
+            color: #dc2626;
+            border: none;
+            padding: 4px 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .btn-eliminar:hover { background: #fecaca; }
+
+        /* ── DIVISOR ── */
+        .divisor {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 16px 0;
+            color: #9ca3af;
+            font-size: 0.82rem;
+            font-weight: 600;
+        }
+
+        .divisor::before,
+        .divisor::after {
+            content: "";
+            flex: 1;
+            height: 1px;
+            background: #e5e7eb;
+        }
+
+        .contador { font-size: 0.82rem; color: #6b7280; margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <!-- HEADER -->
+    <div class="header">
+        <h2>📊 Panel de Administración — Cayena</h2>
+        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+            <a href="/exportar_excel" class="btn btn-excel">📥 Exportar Excel</a>
+            <a href="/logout"         class="btn btn-logout">🔒 Cerrar sesión</a>
+        </div>
+    </div>
+
+    <!-- TABS -->
+    <div class="tabs">
+        <button class="tab active" onclick="mostrarTab('tab-registros', this)">
+            📋 Inscritos ({{ usuarios|length }})
+        </button>
+        <button class="tab" onclick="mostrarTab('tab-vehiculos', this)">
+            🚗 Vehículos Autorizados ({{ vehiculos|length }})
+        </button>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════
+         TAB 1 — REGISTROS
+    ════════════════════════════════════════════════════ -->
+    <div id="tab-registros" class="tab-content active">
+        <p class="contador">Total inscritos al sorteo: <strong>{{ usuarios|length }}</strong></p>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Cédula</th><th>Nombre</th><th>Torre</th><th>Apto</th>
+                        <th>Vehículo</th><th>Placa</th><th>Marca</th><th>Modelo</th>
+                        <th>Color</th><th>Celular</th><th>Correo</th>
+                        <th>Estado</th><th>Documentos</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for u in usuarios %}
+                    <tr>
+                        <td>{{ u.cedula }}</td>
+                        <td>{{ u.nombre }}</td>
+                        <td>{{ u.torre }}</td>
+                        <td>{{ u.apto }}</td>
+                        <td>{{ u.vehiculo }}</td>
+                        <td><strong>{{ u.placa }}</strong></td>
+                        <td>{{ u.marca }}</td>
+                        <td>{{ u.modelo }}</td>
+                        <td>{{ u.color }}</td>
+                        <td>{{ u.celular }}</td>
+                        <td>{{ u.correo }}</td>
+                        <td>
+                            {% if u.estado == 'Completo' %}
+                                <span class="badge badge-ok">✅ Completo</span>
+                            {% else %}
+                                <span class="badge badge-sin">⚠️ Sin docs</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% for archivo in u.archivos %}
+                                <a href="/uploads/{{ u.cedula }}/{{ archivo }}" target="_blank">📄 Ver</a><br>
+                            {% endfor %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════
+         TAB 2 — VEHÍCULOS AUTORIZADOS
+    ════════════════════════════════════════════════════ -->
+    <div id="tab-vehiculos" class="tab-content">
+
+        <!-- CARGA MASIVA EXCEL -->
+        <div class="panel">
+            <h3>📂 Carga masiva desde Excel</h3>
+            <form action="/admin/cargar_excel" method="POST" enctype="multipart/form-data">
+                <div class="upload-area">
+                    <input type="file" name="archivo_excel" accept=".xlsx,.xls" required>
+                    <button type="submit" class="btn-cargar">⬆️ Cargar Excel</button>
+                </div>
+                <p class="upload-info">
+                    Sube el archivo del conjunto (hoja <strong>CONSOLIDADO AUTOS Y MOTOS</strong>).
+                    Puedes subirlo varias veces — las placas que ya existan se omiten automáticamente.
+                </p>
+            </form>
+        </div>
+
+        <div class="divisor">ó agrega uno manualmente</div>
+
+        <!-- FORMULARIO UNO A UNO -->
+        <div class="panel">
+            <h3>➕ Autorizar vehículo individual</h3>
+            <form action="/admin/agregar_vehiculo" method="POST">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Placa *</label>
+                        <input name="placa" placeholder="Ej: ABC123" maxlength="6" required
+                               style="text-transform:uppercase" id="inputPlacaAdmin">
+                    </div>
+                    <div class="form-group">
+                        <label>Tipo *</label>
+                        <select name="tipo" required>
+                            <option value="">Seleccione</option>
+                            <option>Carro</option>
+                            <option>Moto</option>
+                            <option>Bicicleta Electrica</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Torre *</label>
+                        <input name="torre" placeholder="Ej: 5" maxlength="2" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Apto *</label>
+                        <input name="apto" placeholder="Ej: 901" maxlength="4" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Nombre Residente *</label>
+                        <input name="nombre_residente" placeholder="Nombre completo" required>
+                    </div>
+                    <div class="form-group">
+                        <button type="submit" class="btn-agregar">✅ Autorizar</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <!-- TABLA VEHÍCULOS -->
+        <p class="contador">Total autorizados: <strong>{{ vehiculos|length }}</strong></p>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Placa</th><th>Tipo</th><th>Torre</th><th>Apto</th>
+                        <th>Residente</th><th>Fecha</th><th>Acción</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for v in vehiculos %}
+                    <tr>
+                        <td><strong>{{ v.placa }}</strong></td>
+                        <td>
+                            {% if v.tipo == 'Carro' %}
+                                <span class="badge badge-tipo-carro">🚗 Carro</span>
+                            {% elif v.tipo == 'Moto' %}
+                                <span class="badge badge-tipo-moto">🏍 Moto</span>
+                            {% else %}
+                                <span class="badge badge-tipo-bici">🚲 Bici E.</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ v.torre }}</td>
+                        <td>{{ v.apto }}</td>
+                        <td>{{ v.nombre_residente }}</td>
+                        <td>{{ v.fecha_registro[:10] if v.fecha_registro else '—' }}</td>
+                        <td>
+                            <form action="/admin/eliminar_vehiculo/{{ v.placa }}" method="POST"
+                                  onsubmit="return confirm('¿Eliminar la placa {{ v.placa }}?')">
+                                <button type="submit" class="btn-eliminar">🗑 Eliminar</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+
+                    {% if vehiculos|length == 0 %}
+                    <tr>
+                        <td colspan="7" style="text-align:center; color:#9ca3af; padding:24px;">
+                            No hay vehículos autorizados aún. Carga el Excel o agrega uno arriba.
+                        </td>
+                    </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+<script>
+function mostrarTab(id, btn) {
+    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    btn.classList.add('active');
+}
+
+// Mayúsculas automáticas en placa
+document.getElementById('inputPlacaAdmin').addEventListener('input', function () {
+    this.value = this.value.toUpperCase();
+});
+</script>
+
+</body>
+</html>

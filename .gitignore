@@ -1,0 +1,32 @@
+# ============================================================
+# GITIGNORE - SISTEMA PARQUEADERO CAYENA
+# ============================================================
+
+# Variables de entorno (NUNCA subir al repo)
+.env
+
+# Entornos virtuales Python
+.venv/
+venv/
+env/
+
+# Archivos subidos por usuarios
+uploads/
+
+# Logs del sistema
+app/logs/*.log
+
+# Cache Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# IDEs
+.idea/
+.vscode/
+*.iml
+
+# Sistema operativo
+.DS_Store
+Thumbs.db

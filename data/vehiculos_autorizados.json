@@ -1,0 +1,20 @@
+{
+    "vehiculos": [
+        {
+            "placa": "GIC23F",
+            "tipo": "Moto",
+            "torre": "05",
+            "apto": "901",
+            "nombre_residente": "Luis Larrota",
+            "fecha_registro": "2026-05-04 00:05:23.827892"
+        },
+        {
+            "placa": "MIR323",
+            "tipo": "Carro",
+            "torre": "05",
+            "apto": "302",
+            "nombre_residente": "Pedro palacios",
+            "fecha_registro": "2026-05-04 22:06:21.041360"
+        }
+    ]
+}
